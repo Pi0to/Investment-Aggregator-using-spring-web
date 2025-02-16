@@ -1,5 +1,8 @@
 package com.piotodev.investment.aggregator.controller;
 
+import com.piotodev.investment.aggregator.controller.dto.CreateAccountDTO;
+import com.piotodev.investment.aggregator.controller.dto.CreateUserDTO;
+import com.piotodev.investment.aggregator.controller.dto.UpdateUserDTO;
 import com.piotodev.investment.aggregator.entities.User;
 import com.piotodev.investment.aggregator.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +17,11 @@ import java.util.UUID;
 @RequestMapping("/v1/users")
 public class UserController {
 
-    @Autowired
     private UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody CreateUserDTO body){
@@ -62,6 +68,22 @@ public class UserController {
         userService.updateUserById(uuid, body);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{userId}/accounts")
+    public ResponseEntity<Void> createAccount(@PathVariable("userId") String userId, @RequestBody CreateAccountDTO accountDTO){
+
+        userService.createAccount(userId, accountDTO);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{userId}/accounts/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable("accountId") String accountId){
+
+        userService.deleteAccount(UUID.fromString(accountId));
+
+        return ResponseEntity.ok().build();
     }
 
 }
