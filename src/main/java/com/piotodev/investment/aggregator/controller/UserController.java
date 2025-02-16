@@ -1,16 +1,17 @@
 package com.piotodev.investment.aggregator.controller;
 
+import com.piotodev.investment.aggregator.controller.dto.AccountDTO;
 import com.piotodev.investment.aggregator.controller.dto.CreateAccountDTO;
 import com.piotodev.investment.aggregator.controller.dto.CreateUserDTO;
 import com.piotodev.investment.aggregator.controller.dto.UpdateUserDTO;
 import com.piotodev.investment.aggregator.entities.User;
 import com.piotodev.investment.aggregator.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -79,11 +80,25 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/accounts/{accountId}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable("accountId") String accountId){
+    public ResponseEntity<Void> deleteAccount(@PathVariable("userId") String userId, @PathVariable("accountId") String accountId){
+
+        userService
+                .getUserById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         userService.deleteAccount(UUID.fromString(accountId));
 
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{userId}/accounts")
+    public ResponseEntity<List<AccountDTO>> getAccounts(@PathVariable("userId") String userId){
+
+        var accounts = userService.getAccounts(UUID.fromString(userId));
+
+        var accountsDTO = accounts.stream()
+                .map(ac -> new AccountDTO(ac.getAccountId(), ac.getDescription()));
+
+        return ResponseEntity.ok().body(accountsDTO.toList());
+    }
 }
