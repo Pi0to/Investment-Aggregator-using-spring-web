@@ -1,9 +1,6 @@
 package com.piotodev.investment.aggregator.controller;
 
-import com.piotodev.investment.aggregator.controller.dto.AccountDTO;
-import com.piotodev.investment.aggregator.controller.dto.CreateAccountDTO;
-import com.piotodev.investment.aggregator.controller.dto.CreateUserDTO;
-import com.piotodev.investment.aggregator.controller.dto.UpdateUserDTO;
+import com.piotodev.investment.aggregator.controller.dto.*;
 import com.piotodev.investment.aggregator.entities.User;
 import com.piotodev.investment.aggregator.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -116,14 +113,17 @@ public class UserController {
 
 
     @PostMapping("/{userId}/accounts/{accountId}")
-    public ResponseEntity<AccountDTO> updateAccount(@PathVariable("userId") String userId,
+    public ResponseEntity<Void> updateAccount(@PathVariable("userId") String userId,
                                                     @PathVariable("accountId") String accountId,
-                                                    @RequestBody AccountDTO accountDTO){
+                                                    @RequestBody UpdateAccountDTO accountDTO){
 
         userService
                 .getUserById(UUID.fromString(userId))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return null;
+        userService.updateAccount(accountId, accountDTO);
+
+
+        return ResponseEntity.ok().build();
     }
 }
