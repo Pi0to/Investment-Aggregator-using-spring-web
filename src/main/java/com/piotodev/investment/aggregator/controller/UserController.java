@@ -8,6 +8,7 @@ import com.piotodev.investment.aggregator.entities.User;
 import com.piotodev.investment.aggregator.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.List;
@@ -37,11 +38,8 @@ public class UserController {
 
         var user = userService.getUserById(UUID.fromString(userId));
 
-        if(user.isPresent()){
-            return ResponseEntity.ok(user.get());
-        }
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping
@@ -79,8 +77,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{userId}/accounts/{accountId}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable("userId") String userId, @PathVariable("accountId") String accountId){
+    @DeleteMapping("/{userId}/accounts/{accountId}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable("userId") String userId,
+                                              @PathVariable("accountId") String accountId){
 
         userService
                 .getUserById(UUID.fromString(userId))
@@ -100,5 +99,31 @@ public class UserController {
                 .map(ac -> new AccountDTO(ac.getAccountId(), ac.getDescription()));
 
         return ResponseEntity.ok().body(accountsDTO.toList());
+    }
+
+    @GetMapping("/{userId}/accounts/{accountId}")
+    public ResponseEntity<AccountDTO> getAccountById(@PathVariable("userId") String userId,
+                                                     @PathVariable("accountId") String accountId){
+
+        userService
+                .getUserById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        var accountUpdated = userService.getAccountById(accountId);
+
+        return ResponseEntity.ok().body(accountUpdated);
+    }
+
+
+    @PostMapping("/{userId}/accounts/{accountId}")
+    public ResponseEntity<AccountDTO> updateAccount(@PathVariable("userId") String userId,
+                                                    @PathVariable("accountId") String accountId,
+                                                    @RequestBody AccountDTO accountDTO){
+
+        userService
+                .getUserById(UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return null;
     }
 }

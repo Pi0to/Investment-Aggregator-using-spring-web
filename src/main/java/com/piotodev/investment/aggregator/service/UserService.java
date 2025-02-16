@@ -1,5 +1,6 @@
 package com.piotodev.investment.aggregator.service;
 
+import com.piotodev.investment.aggregator.controller.dto.AccountDTO;
 import com.piotodev.investment.aggregator.controller.dto.CreateAccountDTO;
 import com.piotodev.investment.aggregator.controller.dto.CreateUserDTO;
 import com.piotodev.investment.aggregator.controller.dto.UpdateUserDTO;
@@ -118,5 +119,14 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    public AccountDTO getAccountById(String id){
+
+
+        var account = accountRepository.getById(UUID.fromString(id));
+
+
+
+        return new AccountDTO(account.getAccountId(), account.getDescription());
+    }
 
 }
