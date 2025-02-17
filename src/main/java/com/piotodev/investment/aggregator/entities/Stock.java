@@ -21,5 +21,5 @@ public class Stock {
     private String stockID;
 
     @Column(name = "description")
-    private String description;
+    private String description;.
 }
