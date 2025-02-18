@@ -70,7 +70,7 @@ public class UserService {
         }
     }
 
-    public void deleteById (UUID id){
+    public void deleteUserById (UUID id){
 
         if(userRepository.findById(id).isPresent()){
             userRepository.deleteById(id);
@@ -140,4 +140,24 @@ public class UserService {
         accountRepository.save(account);
     }
 
+    public BillingAdress getBillingAdress(String accountId){
+
+        return billingAdressRepository.
+                findById(UUID.fromString(accountId))
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+    }
+
+    public void updateBillingAdress(String accountId, BillingAdressDTO billingAdressDTO){
+
+        var billingAdress = billingAdressRepository
+                .findById(UUID.fromString(accountId))
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        billingAdress.setStreet(billingAdressDTO.street());
+        billingAdress.setNumber(billingAdressDTO.number());
+
+        billingAdressRepository.save(billingAdress);
+
+    }
 }

@@ -1,6 +1,7 @@
 package com.piotodev.investment.aggregator.controller;
 
 import com.piotodev.investment.aggregator.controller.dto.*;
+import com.piotodev.investment.aggregator.entities.BillingAdress;
 import com.piotodev.investment.aggregator.entities.User;
 import com.piotodev.investment.aggregator.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers(){
+public ResponseEntity<List<User>> getAllUsers(){
 
         var users = userService.getAllUsers();
 
@@ -48,10 +49,10 @@ public class UserController {
     }
 
     @DeleteMapping ("/{userId}")
-    public ResponseEntity<Void> deleteById(@PathVariable String userId){
+    public ResponseEntity<Void> deleteUserById(@PathVariable String userId){
         var uuid = UUID.fromString(userId);
 
-        userService.deleteById(uuid);
+        userService.deleteUserById(uuid);
 
         return ResponseEntity.noContent().build();
     }
@@ -123,6 +124,22 @@ public class UserController {
 
         userService.updateAccount(accountId, accountDTO);
 
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/accounts/{accountId}/billingadress")
+    public ResponseEntity<BillingAdress> getBillingAdress(@PathVariable("accountId") String accountId){
+
+        var billingAdress = userService.getBillingAdress(accountId);
+
+        return ResponseEntity.ok().body(billingAdress);
+    }
+
+    @PostMapping("/{userId}/accounts/{accountId}/billingadress")
+    public ResponseEntity<Void> updateBillingAdress(@PathVariable("accountId") String accountId, @RequestBody BillingAdressDTO billingAdress){
+
+        userService.updateBillingAdress(accountId, billingAdress);
 
         return ResponseEntity.ok().build();
     }

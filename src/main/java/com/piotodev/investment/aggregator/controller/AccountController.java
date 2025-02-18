@@ -1,43 +1,41 @@
 package com.piotodev.investment.aggregator.controller;
 
-import com.piotodev.investment.aggregator.controller.dto.BillingAdressDTO;
-import com.piotodev.investment.aggregator.entities.BillingAdress;
-import com.piotodev.investment.aggregator.repository.BillingAdressRepository;
+import com.piotodev.investment.aggregator.controller.dto.AccountStockOutDTO;
+import com.piotodev.investment.aggregator.controller.dto.AssociateStockDTO;
+import com.piotodev.investment.aggregator.controller.dto.CreateAccountDTO;
+import com.piotodev.investment.aggregator.entities.AccountStock;
 import com.piotodev.investment.aggregator.service.AccountService;
-import com.piotodev.investment.aggregator.service.UserService;
-import org.springframework.data.web.ReactiveOffsetScrollPositionHandlerMethodArgumentResolver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/v1/users/{userID}/accounts/{accountId}")
+@RequestMapping("/v1/accounts")
 public class AccountController {
 
-    private UserService userService;
     private AccountService accountService;
 
-    public AccountController(UserService userService, AccountService accountService){
-        this.userService = userService;
+    public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-    //Billing Address
-    @GetMapping("/billingadress")
-    public ResponseEntity<BillingAdress> getBillingAdress(@PathVariable("accountId") String accountId){
+    @PostMapping("/{accountId}")
+    public ResponseEntity<Void> associateStock(@PathVariable("accountId") String accountId, @RequestBody AssociateStockDTO associateStockDTO){
 
-        var billingAdress = accountService.getBillingAdress(accountId);
+        accountService.associateStock(accountId, associateStockDTO);
 
-        return ResponseEntity.ok().body(billingAdress);
+        return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/billingadress")
-    public ResponseEntity<Void> updateBillingAdress(@PathVariable("accountId") String accountId, @RequestBody BillingAdressDTO billingAdress){
+    @GetMapping("/{accountId}")
+    public ResponseEntity<List<AccountStockOutDTO>> getStocks(@PathVariable("accountId") String accountId){
 
-        accountService.updateBillingAdress(accountId, billingAdress);
+        var stocks = accountService.getStocks(accountId);
 
-        return ResponseEntity.ok().build();
+        var stocksOut = stocks.stream().map(x -> new AccountStockOutDTO(x.getQuantity(), x.getStock())).toList();
+
+        return ResponseEntity.ok().body(stocksOut);
     }
-
-
-
 }
