@@ -1,1 +1,1 @@
-A investment aggregator using spring web
+A investment aggregator using spring web and brapi API
